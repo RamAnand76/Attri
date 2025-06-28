@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolt.new - Chat & Workbench Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafafa;
+            color: #171717;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            height: 54px;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            padding: 6px 12px;
+            border: 1px solid #e5e5e5;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .header-btn.active {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Chat Section */
+        .chat-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-right: 1px solid #e5e5e5;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+
+        .message.user {
+            background: #f5f5f5;
+            margin-left: 40px;
+        }
+
+        .message.assistant {
+            background: #f0f9ff;
+            margin-right: 40px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #6b7280;
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background: #2563eb;
+            color: white;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            line-height: 1.5;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .artifact-preview {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f9fafb;
+        }
+
+        .artifact-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .artifact-actions {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+        }
+
+        .action-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .action-status.complete { background: #10b981; }
+        .action-status.running { background: #f59e0b; animation: pulse 1s infinite; }
+        .action-status.pending { background: #6b7280; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Input */
+        .chat-input-section {
+            padding: 20px;
+            border-top: 1px solid #e5e5e5;
+            background: white;
+        }
+
+        .input-container {
+            position: relative;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-textarea {
+            width: 100%;
+            min-height: 60px;
+            max-height: 200px;
+            padding: 16px 50px 16px 16px;
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .send-button {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            border-top: 1px solid #f5f5f5;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .enhance-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: transparent;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Workbench Section */
+        .workbench-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            background: #f9fafb;
+        }
+
+        .workbench-header {
+            height: 48px;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #2563eb;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .workbench-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* File Tree */
+        .file-tree {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e5e5e5;
+            overflow-y: auto;
+        }
+
+        .file-tree-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e5e5;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .file-item:hover {
+            background: #f5f5f5;
+        }
+
+        .file-item.selected {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .file-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Editor */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            height: 40px;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            font-size: 13px;
+        }
+
+        .file-path {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .editor-btn {
+            padding: 4px 8px;
+            border: 1px solid #e5e5e5;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .editor-content {
+            flex: 1;
+            background: #1f2937;
+            color: #f9fafb;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            padding: 16px;
+            overflow: auto;
+            line-height: 1.5;
+        }
+
+        /* Terminal */
+        .terminal-section {
+            height: 200px;
+            background: #1f2937;
+            color: #f9fafb;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .terminal-header {
+            height: 32px;
+            background: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
+        .terminal-content {
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            height: calc(100% - 32px);
+            overflow-y: auto;
+        }
+
+        .terminal-prompt {
+            color: #10b981;
+        }
+
+        /* Annotations */
+        .annotation {
+            position: absolute;
+            background: #fbbf24;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .annotation::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: #fbbf24;
+        }
+
+        /* Preview Mode */
+        .preview-container {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            height: 40px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+        }
+
+        .preview-url {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .preview-content {
+            flex: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                ⚡ Bolt.new
+            </div>
+            <div class="header-actions">
+                <button class="header-btn active">💬 Chat</button>
+                <button class="header-btn active">⚙️ Workbench</button>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <!-- Annotation -->
+                <div class="annotation" style="top: 80px; left: 20px;">
+                    1. Chat Interface - Real-time AI conversation
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages">
+                    <!-- User Message -->
+                    <div class="message user">
+                        <div class="message-avatar">U</div>
+                        <div class="message-content">
+                            <div class="message-time">2:34 PM</div>
+                            <div class="message-text">
+                                Create a simple React todo app with Tailwind CSS
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assistant Message with Artifact -->
+                    <div class="message assistant">
+                        <div class="message-avatar">AI</div>
+                        <div class="message-content">
+                            <div class="message-time">2:34 PM</div>
+                            <div class="message-text">
+                                I'll create a React todo app with Tailwind CSS for you. This will include add, toggle, and delete functionality.
+                            </div>
+                            
+                            <!-- Artifact Preview -->
+                            <div class="artifact-preview">
+                                <div class="artifact-header">
+                                    📦 React Todo App
+                                </div>
+                                <div class="artifact-actions">
+                                    <div class="action-item">
+                                        <div class="action-status complete"></div>
+                                        Create package.json
+                                    </div>
+                                    <div class="action-item">
+                                        <div class="action-status complete"></div>
+                                        Create App.jsx
+                                    </div>
+                                    <div class="action-item">
+                                        <div class="action-status running"></div>
+                                        Install dependencies
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="code-block">
+// App.jsx
+import React, { useState } from 'react';
+
+function App() {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState('');
+  
+  // Component logic here...
+}</div>
+                        </div>
+                    </div>
+
+                    <!-- System Message -->
+                    <div class="message assistant">
+                        <div class="message-avatar">🔧</div>
+                        <div class="message-content">
+                            <div class="message-time">2:35 PM</div>
+                            <div class="message-text">
+                                ✅ Todo app created successfully! The development server is running on port 3000.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-section">
+                    <!-- Annotation -->
+                    <div class="annotation" style="bottom: 120px; left: 20px;">
+                        2. Message Input - Send prompts to AI
+                    </div>
+
+                    <div class="input-container">
+                        <textarea 
+                            class="chat-textarea" 
+                            placeholder="How can Bolt help you today?"
+                            rows="2"
+                        >Add a dark mode toggle to the todo app</textarea>
+                        <button class="send-button">→</button>
+                    </div>
+                    <div class="input-actions">
+                        <button class="enhance-btn">
+                            ✨ Enhance prompt
+                        </button>
+                        <span>Use Shift + Return for new line</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workbench Section -->
+            <div class="workbench-section">
+                <!-- Annotation -->
+                <div class="annotation" style="top: 80px; right: 20px;">
+                    3. Workbench - Development environment
+                </div>
+
+                <!-- Workbench Header -->
+                <div class="workbench-header">
+                    <div class="view-toggle">
+                        <button class="view-btn active">Code</button>
+                        <button class="view-btn">Preview</button>
+                    </div>
+                    <button class="header-btn">🖥️ Toggle Terminal</button>
+                </div>
+
+                <!-- Workbench Content -->
+                <div class="workbench-content">
+                    <!-- File Tree -->
+                    <div class="file-tree">
+                        <!-- Annotation -->
+                        <div class="annotation" style="top: 20px; left: 260px;">
+                            4. File Tree - Navigate project files
+                        </div>
+
+                        <div class="file-tree-header">
+                            🗂️ Files
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">📁</div>
+                            src/
+                        </div>
+                        <div class="file-item selected" style="padding-left: 32px;">
+                            <div class="file-icon">⚛️</div>
+                            App.jsx
+                        </div>
+                        <div class="file-item" style="padding-left: 32px;">
+                            <div class="file-icon">🎨</div>
+                            index.css
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">📄</div>
+                            package.json
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">📄</div>
+                            index.html
+                        </div>
+                    </div>
+
+                    <!-- Editor -->
+                    <div class="editor-container">
+                        <!-- Annotation -->
+                        <div class="annotation" style="top: 20px; right: 20px;">
+                            5. Code Editor - Edit files with syntax highlighting
+                        </div>
+
+                        <div class="editor-header">
+                            <div class="file-path">
+                                📁 src / ⚛️ App.jsx
+                            </div>
+                            <div class="editor-actions">
+                                <button class="editor-btn">💾 Save</button>
+                                <button class="editor-btn">↶ Reset</button>
+                            </div>
+                        </div>
+                        <div class="editor-content">
+<span style="color: #f59e0b;">import</span> <span style="color: #10b981;">React</span>, { <span style="color: #10b981;">useState</span> } <span style="color: #f59e0b;">from</span> <span style="color: #34d399;">'react'</span>;
+
+<span style="color: #f59e0b;">function</span> <span style="color: #60a5fa;">App</span>() {
+  <span style="color: #f59e0b;">const</span> [<span style="color: #10b981;">todos</span>, <span style="color: #10b981;">setTodos</span>] = <span style="color: #60a5fa;">useState</span>([]);
+  <span style="color: #f59e0b;">const</span> [<span style="color: #10b981;">input</span>, <span style="color: #10b981;">setInput</span>] = <span style="color: #60a5fa;">useState</span>(<span style="color: #34d399;">''</span>);
+
+  <span style="color: #f59e0b;">const</span> <span style="color: #60a5fa;">addTodo</span> = () => {
+    <span style="color: #f59e0b;">if</span> (<span style="color: #10b981;">input</span>.<span style="color: #60a5fa;">trim</span>()) {
+      <span style="color: #60a5fa;">setTodos</span>([...<span style="color: #10b981;">todos</span>, { 
+        <span style="color: #10b981;">id</span>: <span style="color: #a78bfa;">Date</span>.<span style="color: #60a5fa;">now</span>(), 
+        <span style="color: #10b981;">text</span>: <span style="color: #10b981;">input</span>, 
+        <span style="color: #10b981;">completed</span>: <span style="color: #f59e0b;">false</span> 
+      }]);
+      <span style="color: #60a5fa;">setInput</span>(<span style="color: #34d399;">''</span>);
+    }
+  };
+
+  <span style="color: #f59e0b;">return</span> (
+    &lt;<span style="color: #60a5fa;">div</span> <span style="color: #10b981;">className</span>=<span style="color: #34d399;">"min-h-screen bg-gray-100 py-8"</span>&gt;
+      &lt;<span style="color: #60a5fa;">div</span> <span style="color: #10b981;">className</span>=<span style="color: #34d399;">"max-w-md mx-auto bg-white rounded-lg shadow-md p-6"</span>&gt;
+        &lt;<span style="color: #60a5fa;">h1</span> <span style="color: #10b981;">className</span>=<span style="color: #34d399;">"text-2xl font-bold mb-4"</span>&gt;Todo App&lt;/<span style="color: #60a5fa;">h1</span>&gt;
+        <span style="color: #6b7280;">// More JSX here...</span>
+      &lt;/<span style="color: #60a5fa;">div</span>&gt;
+    &lt;/<span style="color: #60a5fa;">div</span>&gt;
+  );
+}
+
+<span style="color: #f59e0b;">export</span> <span style="color: #f59e0b;">default</span> <span style="color: #10b981;">App</span>;
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal -->
+                <div class="terminal-section">
+                    <!-- Annotation -->
+                    <div class="annotation" style="bottom: 220px; right: 20px;">
+                        6. Terminal - Execute commands and see output
+                    </div>
+
+                    <div class="terminal-header">
+                        <span>🖥️ Terminal</span>
+                        <button style="background: none; border: none; color: #9ca3af; cursor: pointer;">×</button>
+                    </div>
+                    <div class="terminal-content">
+<span class="terminal-prompt">project@bolt:~$</span> npm install
+<span style="color: #6b7280;">✓ Dependencies installed successfully</span>
+
+<span class="terminal-prompt">project@bolt:~$</span> npm run dev
+<span style="color: #10b981;">✓ Development server started on http://localhost:3000</span>
+
+<span class="terminal-prompt">project@bolt:~$</span> <span style="animation: blink 1s infinite;">|</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Annotations for Key Features -->
+    <div class="annotation" style="top: 200px; left: 50%; transform: translateX(-50%);">
+        💡 Real-time streaming: AI responses appear as they're generated
+    </div>
+
+    <div class="annotation" style="top: 300px; left: 50%; transform: translateX(-50%);">
+        🔄 Live updates: File changes instantly reflect in preview
+    </div>
+
+    <div class="annotation" style="bottom: 50px; left: 50%; transform: translateX(-50%);">
+        ⚡ Instant execution: AI can run commands and modify files directly
+    </div>
+
+    <style>
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+
+    <script>
+        // Simple interactivity for demo
+        document.addEventListener('DOMContentLoaded', function() {
+            // View toggle functionality
+            const viewBtns = document.querySelectorAll('.view-btn');
+            viewBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    viewBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if (this.textContent === 'Preview') {
+                        showPreview();
+                    } else {
+                        showCode();
+                    }
+                });
+            });
+
+            // File selection
+            const fileItems = document.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    fileItems.forEach(f => f.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Send button
+            const sendBtn = document.querySelector('.send-button');
+            const textarea = document.querySelector('.chat-textarea');
+            
+            sendBtn.addEventListener('click', function() {
+                if (textarea.value.trim()) {
+                    addUserMessage(textarea.value);
+                    textarea.value = '';
+                    
+                    // Simulate AI response
+                    setTimeout(() => {
+                        addAIMessage("I'll add a dark mode toggle to your todo app. Let me update the code...");
+                    }, 1000);
+                }
+            });
+
+            function addUserMessage(text) {
+                const messagesContainer = document.querySelector('.chat-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user';
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">U</div>
+                    <div class="message-content">
+                        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        <div class="message-text">${text}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function addAIMessage(text) {
+                const messagesContainer = document.querySelector('.chat-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant';
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        <div class="message-text">${text}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function showPreview() {
+                const editorContainer = document.querySelector('.editor-container');
+                editorContainer.innerHTML = `
+                    <div class="preview-container">
+                        <div class="preview-header">
+                            <button style="padding: 4px 8px; border: 1px solid #e5e5e5; background: white; border-radius: 4px;">↻</button>
+                            <input class="preview-url" value="http://localhost:3000" readonly>
+                            <button style="padding: 4px 8px; border: 1px solid #e5e5e5; background: white; border-radius: 4px;">🔗</button>
+                        </div>
+                        <div class="preview-content">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; margin-bottom: 16px;">📱</div>
+                                <div style="font-weight: 500; margin-bottom: 8px;">Live Preview</div>
+                                <div>Your React app is running here</div>
+                                <div style="margin-top: 16px; padding: 16px; background: #f0f9ff; border-radius: 8px; max-width: 300px;">
+                                    <div style="font-weight: 600; margin-bottom: 12px; color: #1f2937;">Todo App</div>
+                                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                        <input style="flex: 1; padding: 8px; border: 1px solid #e5e5e5; border-radius: 4px;" placeholder="Add a todo...">
+                                        <button style="padding: 8px 12px; background: #2563eb; color: white; border: none; border-radius: 4px;">Add</button>
+                                    </div>
+                                    <div style="text-align: left;">
+                                        <div style="padding: 8px; background: white; border-radius: 4px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                                            <input type="checkbox"> Learn React
+                                        </div>
+                                        <div style="padding: 8px; background: white; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+                                            <input type="checkbox" checked> Build todo app
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function showCode() {
+                location.reload(); // Simple way to restore code view
+            }
+        });
+    </script>
+</body>
+</html>
