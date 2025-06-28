@@ -1,11 +1,25 @@
 {
-  "name": "bolt",
-  "description": "StackBlitz AI Agent",
+  "name": "bolt-template",
+  "description": "Template for building AI-powered full-stack web development tools",
+  "version": "1.0.0",
   "private": true,
   "license": "MIT",
   "packageManager": "pnpm@9.4.0",
   "sideEffects": false,
   "type": "module",
+  "keywords": [
+    "ai",
+    "webcontainer",
+    "development-tools",
+    "remix",
+    "template",
+    "claude",
+    "anthropic"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/bolt-template.git"
+  },
   "scripts": {
     "deploy": "npm run build && wrangler pages deploy",
     "build": "remix vite:build",

@@ -1,54 +1,213 @@
-[![Bolt.new: AI-Powered Full-Stack Web Development in the Browser](./public/social_preview_index.jpg)](https://bolt.new)
+# Bolt.new Template
 
-# Bolt.new: AI-Powered Full-Stack Web Development in the Browser
+A template for building AI-powered full-stack web development tools in the browser, based on the open-source Bolt.new codebase.
 
-Bolt.new is an AI-powered web development agent that allows you to prompt, run, edit, and deploy full-stack applications directly from your browser—no local setup required. If you're here to build your own AI-powered web dev agent using the Bolt open source codebase, [click here to get started!](./CONTRIBUTING.md)
+## 🚀 Features
 
-## What Makes Bolt.new Different
+- **AI-Powered Development**: Integrated with Claude Sonnet 3.5 for intelligent code generation
+- **In-Browser Development**: Full development environment powered by WebContainer API
+- **Real-time Preview**: Live preview of applications as they're being built
+- **File Management**: Complete file system with editor, terminal, and file tree
+- **Modern Stack**: Built with Remix, React, TypeScript, and Tailwind CSS
 
-Claude, v0, etc are incredible- but you can't install packages, run backends or edit code. That’s where Bolt.new stands out:
+## 🛠 Tech Stack
 
-- **Full-Stack in the Browser**: Bolt.new integrates cutting-edge AI models with an in-browser development environment powered by **StackBlitz’s WebContainers**. This allows you to:
-  - Install and run npm tools and libraries (like Vite, Next.js, and more)
-  - Run Node.js servers
-  - Interact with third-party APIs
-  - Deploy to production from chat
-  - Share your work via a URL
+- **Frontend**: React 18, Remix, TypeScript
+- **Styling**: Tailwind CSS, UnoCSS, SCSS
+- **AI Integration**: Anthropic Claude API, AI SDK
+- **Development Environment**: WebContainer API
+- **Editor**: CodeMirror 6
+- **Terminal**: xterm.js
+- **Deployment**: Cloudflare Pages/Workers
 
-- **AI with Environment Control**: Unlike traditional dev environments where the AI can only assist in code generation, Bolt.new gives AI models **complete control** over the entire  environment including the filesystem, node server, package manager, terminal, and browser console. This empowers AI agents to handle the entire app lifecycle—from creation to deployment.
+## 📋 Prerequisites
 
-Whether you’re an experienced developer, a PM or designer, Bolt.new allows you to build production-grade full-stack applications with ease.
+- Node.js (v20.15.1 or higher)
+- pnpm (v9.4.0 or higher)
+- Anthropic API key
 
-For developers interested in building their own AI-powered development tools with WebContainers, check out the open-source Bolt codebase in this repo!
+## 🚀 Quick Start
 
-## Tips and Tricks
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd bolt-template
+   ```
 
-Here are some tips to get the most out of Bolt.new:
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-- **Be specific about your stack**: If you want to use specific frameworks or libraries (like Astro, Tailwind, ShadCN, or any other popular JavaScript framework), mention them in your initial prompt to ensure Bolt scaffolds the project accordingly.
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Add your Anthropic API key to `.env.local`:
+   ```
+   ANTHROPIC_API_KEY=your_api_key_here
+   VITE_LOG_LEVEL=debug
+   ```
 
-- **Use the enhance prompt icon**: Before sending your prompt, try clicking the 'enhance' icon to have the AI model help you refine your prompt, then edit the results before submitting.
+4. **Start development server**
+   ```bash
+   pnpm run dev
+   ```
 
-- **Scaffold the basics first, then add features**: Make sure the basic structure of your application is in place before diving into more advanced functionality. This helps Bolt understand the foundation of your project and ensure everything is wired up right before building out more advanced functionality.
+5. **Open your browser**
+   Navigate to `http://localhost:5173` and start building!
 
-- **Batch simple instructions**: Save time by combining simple instructions into one message. For example, you can ask Bolt to change the color scheme, add mobile responsiveness, and restart the dev server, all in one go saving you time and reducing API credit consumption significantly.
+## 📁 Project Structure
 
-## FAQs
+```
+├── app/                          # Main application code
+│   ├── components/              # React components
+│   │   ├── chat/               # Chat interface components
+│   │   ├── editor/             # Code editor components
+│   │   ├── workbench/          # Development environment
+│   │   └── ui/                 # Reusable UI components
+│   ├── lib/                    # Core libraries and utilities
+│   │   ├── .server/            # Server-side code
+│   │   ├── hooks/              # React hooks
+│   │   ├── stores/             # State management
+│   │   └── runtime/            # Runtime utilities
+│   ├── routes/                 # Remix routes
+│   ├── styles/                 # Global styles and themes
+│   └── utils/                  # Utility functions
+├── functions/                   # Cloudflare Functions
+├── public/                     # Static assets
+└── types/                      # TypeScript type definitions
+```
 
-**Where do I sign up for a paid plan?**  
-Bolt.new is free to get started. If you need more AI tokens or want private projects, you can purchase a paid subscription in your [Bolt.new](https://bolt.new) settings, in the lower-left hand corner of the application. 
+## 🔧 Configuration
 
-**What happens if I hit the free usage limit?**  
-Once your free daily token limit is reached, AI interactions are paused until the next day or until you upgrade your plan.
+### Environment Variables
 
-**Is Bolt in beta?**  
-Yes, Bolt.new is in beta, and we are actively improving it based on feedback.
+- `ANTHROPIC_API_KEY`: Your Anthropic API key for Claude integration
+- `VITE_LOG_LEVEL`: Logging level (debug, info, warn, error)
+- `VITE_DISABLE_PERSISTENCE`: Disable chat history persistence
 
-**How can I report Bolt.new issues?**  
-Check out the [Issues section](https://github.com/stackblitz/bolt.new/issues) to report an issue or request a new feature. Please use the search feature to check if someone else has already submitted the same issue/request.
+### WebContainer API
 
-**What frameworks/libraries currently work on Bolt?**  
-Bolt.new supports most popular JavaScript frameworks and libraries. If it runs on StackBlitz, it will run on Bolt.new as well.
+This template uses the WebContainer API for in-browser development environments. The API is free for personal and open-source usage. For commercial usage, check [WebContainer API pricing](https://stackblitz.com/pricing#webcontainer-api).
 
-**How can I add make sure my framework/project works well in bolt?**  
-We are excited to work with the JavaScript ecosystem to improve functionality in Bolt. Reach out to us via [hello@stackblitz.com](mailto:hello@stackblitz.com) to discuss how we can partner!
+## 🎨 Customization
+
+### Themes
+
+The template includes a comprehensive theming system with light and dark modes. Customize themes in:
+- `app/styles/variables.scss` - CSS custom properties
+- `app/lib/stores/theme.ts` - Theme state management
+
+### AI Models
+
+Currently configured for Anthropic's Claude, but can be extended to support other models:
+- `app/lib/.server/llm/` - AI model integration
+- `app/routes/api.chat.ts` - Chat API endpoint
+
+### UI Components
+
+All UI components are built with:
+- Tailwind CSS for styling
+- Framer Motion for animations
+- Radix UI for accessible primitives
+
+## 📚 Key Features Explained
+
+### Chat Interface
+- Real-time streaming responses
+- Message history with persistence
+- Prompt enhancement
+- File modification tracking
+
+### Code Editor
+- Syntax highlighting with CodeMirror 6
+- Multiple language support
+- File tree navigation
+- Real-time collaboration
+
+### Development Environment
+- Terminal with full shell access
+- Package manager integration
+- Live preview with hot reload
+- File system operations
+
+### AI Integration
+- Streaming text generation
+- Code parsing and execution
+- File modification detection
+- Context-aware responses
+
+## 🚀 Deployment
+
+### Cloudflare Pages
+
+1. **Build the project**
+   ```bash
+   pnpm run build
+   ```
+
+2. **Deploy to Cloudflare Pages**
+   ```bash
+   pnpm run deploy
+   ```
+
+### Environment Variables for Production
+
+Set these in your Cloudflare Pages dashboard:
+- `ANTHROPIC_API_KEY`
+- Any other environment variables from `.env.local`
+
+## 🧪 Development
+
+### Available Scripts
+
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run start` - Start production server locally
+- `pnpm run test` - Run tests
+- `pnpm run typecheck` - Run TypeScript checks
+- `pnpm run lint` - Run ESLint
+
+### Testing
+
+```bash
+# Run all tests
+pnpm run test
+
+# Run tests in watch mode
+pnpm run test:watch
+
+# Run type checking
+pnpm run typecheck
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🙏 Acknowledgments
+
+- [StackBlitz](https://stackblitz.com) for WebContainer API
+- [Anthropic](https://anthropic.com) for Claude AI
+- [Remix](https://remix.run) for the web framework
+- [Cloudflare](https://cloudflare.com) for hosting platform
+
+## 🆘 Support
+
+- [Documentation](./docs/)
+- [Issues](https://github.com/your-username/bolt-template/issues)
+- [Discussions](https://github.com/your-username/bolt-template/discussions)
+
+---
+
+Built with ❤️ using the Bolt.new open-source codebase
